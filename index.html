@@ -82,6 +82,20 @@ body {
   color: var(--text-secondary);
   font-size: 14px;
 }
+.nav-tabs { display: flex; gap: 2px; background: var(--surface-3); border-radius: 6px; padding: 2px; }
+.nav-tab {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.nav-tab:hover { color: var(--text-primary); }
+.nav-tab.active { background: var(--surface-1); color: var(--text-primary); box-shadow: var(--shadow-sm); }
 
 .layout {
   display: grid;
@@ -381,12 +395,9 @@ body {
 .star-number { font-size: 20px; font-weight: 700; color: var(--accent); }
 .star-label { font-size: 11px; color: var(--text-muted); }
 
-.timeline-section {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
-.timeline-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.timeline-page { padding: 40px 24px; max-width: 800px; margin: 0 auto; }
+.timeline-container h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.timeline-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
 .timeline-year { margin-bottom: 16px; }
 .timeline-year h4 { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 6px; }
 .timeline-item { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; font-size: 13px; }
@@ -424,6 +435,10 @@ body {
 <div class="header">
   <h1>College Baseball Recruiting DB</h1>
   <div class="header-right">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-page="database" onclick="setPage('database')">Database</button>
+      <button class="nav-tab" data-page="timeline" onclick="setPage('timeline')">Recruiting Timeline</button>
+    </div>
     <span class="stat-badge" id="results-badge">178 schools</span>
     <button class="theme-toggle" onclick="toggleTheme()">Dark</button>
   </div>
@@ -577,11 +592,15 @@ body {
     <div id="card-view" class="card-grid"></div>
     <div id="table-view" style="display:none"></div>
 
-    <div class="timeline-section" id="timeline-section">
-      <h3>Recruiting Timeline & Checklist</h3>
-      <div id="timeline-content"></div>
-    </div>
   </main>
+</div>
+
+<div class="timeline-page" id="timeline-page" style="display:none">
+  <div class="timeline-container">
+    <h2>Recruiting Timeline & Checklist</h2>
+    <p class="timeline-subtitle">Track your progress through the college baseball recruiting process. Checks save automatically.</p>
+    <div id="timeline-content"></div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
@@ -933,6 +952,12 @@ function openDetail(name) {
 function closeModal(e) {
   if (!e || e.target === document.getElementById('modal-overlay'))
     document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+function setPage(page) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.page === page));
+  document.querySelector('.layout').style.display = page === 'database' ? 'grid' : 'none';
+  document.getElementById('timeline-page').style.display = page === 'timeline' ? 'block' : 'none';
 }
 
 function setView(view) {
