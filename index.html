@@ -172,17 +172,18 @@ body {
 }
 .slider-row input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid var(--surface-1);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
+  touch-action: pan-x;
 }
 .slider-row input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid var(--surface-1);
@@ -422,11 +423,50 @@ body {
 }
 
 @media (max-width: 768px) {
+  .header { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+  .header h1 { font-size: 16px; width: 100%; }
+  .header-right { width: 100%; justify-content: space-between; }
+  .nav-tabs { flex: 1; }
+  .nav-tab { font-size: 12px; padding: 6px 10px; }
   .layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .sidebar {
+    position: static;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  .sidebar.collapsed .filter-section:not(.filter-section--always) { display: none; }
+  .sidebar.collapsed .clear-filters { display: none; }
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .filter-toggle::after { content: "Show Filters"; font-weight: 500; color: var(--accent); font-size: 12px; }
+  .sidebar:not(.collapsed) .filter-toggle::after { content: "Hide Filters"; }
+  .main { padding: 16px; }
+  .results-header { flex-direction: column; align-items: flex-start; }
+  .controls { width: 100%; justify-content: space-between; }
   .card-grid { grid-template-columns: 1fr; }
-  .detail-grid { grid-template-columns: 1fr; }
   .card-meta { grid-template-columns: 1fr 1fr; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .modal { margin: 12px; max-height: 90vh; border-radius: 10px; }
+  .modal-header { padding: 16px; }
+  .modal-body { padding: 16px; }
+  .program-stars { flex-wrap: wrap; gap: 8px; }
+  .star-item { min-width: 40%; }
+  .timeline-page { padding: 20px 16px; }
+  .table-wrapper { font-size: 12px; }
+  .sort-control select { max-width: 140px; }
+}
+@media (min-width: 769px) {
+  .filter-toggle { display: none; }
 }
 </style>
 </head>
@@ -445,11 +485,12 @@ body {
 </div>
 
 <div class="layout">
-  <aside class="sidebar">
-    <div class="filter-section">
+  <aside class="sidebar collapsed" id="sidebar">
+    <div class="filter-section filter-section--always">
       <h3>Search</h3>
       <input type="text" class="search-input" id="search" placeholder="School, city, state, coach...">
     </div>
+    <div class="filter-toggle" onclick="document.getElementById('sidebar').classList.toggle('collapsed')"></div>
 
     <div class="filter-section">
       <h3>Division</h3>
