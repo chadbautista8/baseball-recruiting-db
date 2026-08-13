@@ -501,20 +501,6 @@ body {
       </div>
     </div>
 
-    <div class="filter-section">
-      <h3>Tuition (Annual Max)</h3>
-      <div class="range-row">
-        <span>$</span>
-        <input type="number" id="tuition-max" placeholder="e.g. 40000" step="5000">
-      </div>
-    </div>
-
-    <div class="filter-section">
-      <h3>Enrollment (Max)</h3>
-      <div class="range-row">
-        <input type="number" id="enrollment-max" placeholder="e.g. 20000" step="5000">
-      </div>
-    </div>
 
     <div class="filter-section">
       <h3>Scholarship</h3>
@@ -714,9 +700,6 @@ function bindEvents() {
   ['region-filter','state-filter','conference-filter','climate-filter','ranking-filter','sort-select'].forEach(id => {
     document.getElementById(id).addEventListener('change', applyFilters);
   });
-  ['tuition-max','enrollment-max'].forEach(id => {
-    document.getElementById(id).addEventListener('input', applyFilters);
-  });
   ['gpa-min','core-gpa-min','sat-min','velo-min','exit-velo-min','dash-max'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', () => { updateSliderDisplay(id); applyFilters(); });
@@ -758,8 +741,6 @@ function applyFilters() {
   const gpaMin = parseFloat(document.getElementById('gpa-min').value) || 0;
   const coreGpaMin = parseFloat(document.getElementById('core-gpa-min').value) || 0;
   const satMin = parseFloat(document.getElementById('sat-min').value) || 0;
-  const tuitionMax = parseFloat(document.getElementById('tuition-max').value) || null;
-  const enrollmentMax = parseFloat(document.getElementById('enrollment-max').value) || null;
   const veloMin = parseFloat(document.getElementById('velo-min').value) || 50;
   const exitVeloMin = parseFloat(document.getElementById('exit-velo-min').value) || 50;
   const dashMax = parseFloat(document.getElementById('dash-max').value) / 10 || 8.0;
@@ -785,10 +766,6 @@ function applyFilters() {
     if (coreGpaMin > 0 && coreGpa !== null && coreGpa < coreGpaMin) return false;
     const sat = parseNum(s['Min SAT (Math+Reading)']);
     if (satMin > 0 && sat !== null && sat < satMin) return false;
-    const tuition = s['Tuition (Annual)'];
-    if (tuitionMax && tuition && tuition > tuitionMax) return false;
-    const enrollment = s['Enrollment'];
-    if (enrollmentMax && enrollment && enrollment > enrollmentMax) return false;
     const velo = parseNum(s['Pitcher Velocity (Target)']);
     if (veloMin > 50 && velo !== null && velo < veloMin) return false;
     const exitVelo = parseNum(s['Position Player Exit Velo (D1)']) || parseNum(s['Position Player Exit Velo (D2)']);
@@ -970,9 +947,6 @@ function clearFilters() {
   document.getElementById('search').value = '';
   document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
   ['region-filter','state-filter','conference-filter','climate-filter','ranking-filter'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  ['tuition-max','enrollment-max'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('gpa-min').value = 0;
