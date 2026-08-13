@@ -821,18 +821,18 @@ function applyFilters() {
       if (parseRanking(s['Academic Ranking']) > parseRanking(ranking)) return false;
     }
     const gpa = parseNum(s['Typical Institutional GPA']);
-    if (gpaMin > 0 && gpa !== null && gpa < gpaMin) return false;
+    if (gpaMin > 0 && gpa !== null && gpa > gpaMin) return false;
     const coreGpa = parseNum(s['Min Core GPA (NCAA)']);
-    if (coreGpaMin > 0 && coreGpa !== null && coreGpa < coreGpaMin) return false;
+    if (coreGpaMin > 0 && coreGpa !== null && coreGpa > coreGpaMin) return false;
     const sat = parseNum(s['Min SAT (Math+Reading)']);
-    if (satMin > 0 && sat !== null && sat < satMin) return false;
+    if (satMin > 0 && sat !== null && sat > satMin) return false;
     const velo = parseNum(s['Pitcher Velocity (Target)']);
-    if (veloMin > 50 && velo !== null && velo < veloMin) return false;
+    if (veloMin > 50 && velo !== null && velo > veloMin) return false;
     const exitVelo = parseNum(s['Position Player Exit Velo (D1)']) || parseNum(s['Position Player Exit Velo (D2)']);
-    if (exitVeloMin > 50 && exitVelo !== null && exitVelo < exitVeloMin) return false;
+    if (exitVeloMin > 50 && exitVelo !== null && exitVelo > exitVeloMin) return false;
     if (dashMax < 8.0) {
       const dash = parseNum(s['Position Player 60yd Dash']);
-      if (dash !== null && dash > dashMax) return false;
+      if (dash !== null && dashMax > dash) return false;
     }
     if (quality.includes('tourney') && !(s['NCAA Tournament (10yr)'] > 0)) return false;
     if (quality.includes('cws') && !(s['CWS Appearances (10yr)'] > 0)) return false;
