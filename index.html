@@ -133,7 +133,7 @@ body {
 .chip:hover { border-color: var(--accent); color: var(--accent); }
 .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .range-row { display: flex; gap: 8px; align-items: center; }
-.range-row input {
+.range-row input[type="number"] {
   width: 80px;
   padding: 6px 8px;
   border: 1px solid var(--border);
@@ -143,8 +143,45 @@ body {
   font-size: 13px;
   outline: none;
 }
-.range-row input:focus { border-color: var(--accent); }
+.range-row input[type="number"]:focus { border-color: var(--accent); }
 .range-row span { color: var(--text-muted); font-size: 12px; }
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-row input[type="range"] {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface-3);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+.slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--surface-1);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.slider-row input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--surface-1);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.slider-value {
+  min-width: 38px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: right;
+}
 .filter-select {
   width: 100%;
   padding: 6px 10px;
@@ -441,20 +478,26 @@ body {
     </div>
 
     <div class="filter-section">
-      <h3>GPA (Institutional)</h3>
-      <div class="range-row">
-        <input type="number" id="gpa-min" placeholder="Min" step="0.1" min="0" max="4.0">
-        <span>to</span>
-        <input type="number" id="gpa-max" placeholder="Max" step="0.1" min="0" max="4.0">
+      <h3>Min GPA (Institutional)</h3>
+      <div class="slider-row">
+        <input type="range" id="gpa-min" min="0" max="4.0" step="0.1" value="0">
+        <span class="slider-value" id="gpa-min-val">0</span>
       </div>
     </div>
 
     <div class="filter-section">
-      <h3>SAT Score</h3>
-      <div class="range-row">
-        <input type="number" id="sat-min" placeholder="Min" step="10">
-        <span>to</span>
-        <input type="number" id="sat-max" placeholder="Max" step="10">
+      <h3>Min Core GPA (NCAA)</h3>
+      <div class="slider-row">
+        <input type="range" id="core-gpa-min" min="0" max="4.0" step="0.1" value="0">
+        <span class="slider-value" id="core-gpa-min-val">0</span>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h3>Min SAT Score</h3>
+      <div class="slider-row">
+        <input type="range" id="sat-min" min="0" max="1600" step="10" value="0">
+        <span class="slider-value" id="sat-min-val">0</span>
       </div>
     </div>
 
@@ -482,18 +525,26 @@ body {
     </div>
 
     <div class="filter-section">
-      <h3>Pitcher Velocity (Min)</h3>
-      <div class="range-row">
-        <input type="number" id="velo-min" placeholder="e.g. 88" step="1">
-        <span>+ mph</span>
+      <h3>Pitcher Velocity (Min mph)</h3>
+      <div class="slider-row">
+        <input type="range" id="velo-min" min="50" max="100" step="1" value="50">
+        <span class="slider-value" id="velo-min-val">50</span>
       </div>
     </div>
 
     <div class="filter-section">
-      <h3>Exit Velocity (Min)</h3>
-      <div class="range-row">
-        <input type="number" id="exit-velo-min" placeholder="e.g. 80" step="1">
-        <span>+ mph</span>
+      <h3>Exit Velocity (Min mph)</h3>
+      <div class="slider-row">
+        <input type="range" id="exit-velo-min" min="50" max="100" step="1" value="50">
+        <span class="slider-value" id="exit-velo-min-val">50</span>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h3>60yd Dash (Max sec)</h3>
+      <div class="slider-row">
+        <input type="range" id="dash-max" min="60" max="80" step="1" value="80">
+        <span class="slider-value" id="dash-max-val">8.0</span>
       </div>
     </div>
 
@@ -663,8 +714,12 @@ function bindEvents() {
   ['region-filter','state-filter','conference-filter','climate-filter','ranking-filter','sort-select'].forEach(id => {
     document.getElementById(id).addEventListener('change', applyFilters);
   });
-  ['gpa-min','gpa-max','sat-min','sat-max','tuition-max','enrollment-max','velo-min','exit-velo-min'].forEach(id => {
+  ['tuition-max','enrollment-max'].forEach(id => {
     document.getElementById(id).addEventListener('input', applyFilters);
+  });
+  ['gpa-min','core-gpa-min','sat-min','velo-min','exit-velo-min','dash-max'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => { updateSliderDisplay(id); applyFilters(); });
   });
   ['division-chips','type-chips','scholarship-chips','quality-chips'].forEach(id => {
     document.querySelectorAll('#' + id + ' .chip').forEach(chip => {
@@ -675,6 +730,18 @@ function bindEvents() {
 
 function getActiveChips(containerId) {
   return [...document.querySelectorAll('#' + containerId + ' .chip.active')].map(c => c.dataset.value);
+}
+
+function updateSliderDisplay(id) {
+  const el = document.getElementById(id);
+  const valEl = document.getElementById(id + '-val');
+  if (id === 'dash-max') {
+    valEl.textContent = (parseFloat(el.value) / 10).toFixed(1);
+  } else if (id === 'gpa-min' || id === 'core-gpa-min') {
+    valEl.textContent = parseFloat(el.value).toFixed(1);
+  } else {
+    valEl.textContent = el.value;
+  }
 }
 
 function applyFilters() {
@@ -688,14 +755,14 @@ function applyFilters() {
   const conference = document.getElementById('conference-filter').value;
   const climate = document.getElementById('climate-filter').value;
   const ranking = document.getElementById('ranking-filter').value;
-  const gpaMin = parseFloat(document.getElementById('gpa-min').value) || null;
-  const gpaMax = parseFloat(document.getElementById('gpa-max').value) || null;
-  const satMin = parseFloat(document.getElementById('sat-min').value) || null;
-  const satMax = parseFloat(document.getElementById('sat-max').value) || null;
+  const gpaMin = parseFloat(document.getElementById('gpa-min').value) || 0;
+  const coreGpaMin = parseFloat(document.getElementById('core-gpa-min').value) || 0;
+  const satMin = parseFloat(document.getElementById('sat-min').value) || 0;
   const tuitionMax = parseFloat(document.getElementById('tuition-max').value) || null;
   const enrollmentMax = parseFloat(document.getElementById('enrollment-max').value) || null;
-  const veloMin = parseFloat(document.getElementById('velo-min').value) || null;
-  const exitVeloMin = parseFloat(document.getElementById('exit-velo-min').value) || null;
+  const veloMin = parseFloat(document.getElementById('velo-min').value) || 50;
+  const exitVeloMin = parseFloat(document.getElementById('exit-velo-min').value) || 50;
+  const dashMax = parseFloat(document.getElementById('dash-max').value) / 10 || 8.0;
 
   let filtered = schools.filter(s => {
     if (query) {
@@ -713,19 +780,23 @@ function applyFilters() {
       if (parseRanking(s['Academic Ranking']) > parseRanking(ranking)) return false;
     }
     const gpa = parseNum(s['Typical Institutional GPA']);
-    if (gpaMin && gpa !== null && gpa < gpaMin) return false;
-    if (gpaMax && gpa !== null && gpa > gpaMax) return false;
+    if (gpaMin > 0 && gpa !== null && gpa < gpaMin) return false;
+    const coreGpa = parseNum(s['Min Core GPA (NCAA)']);
+    if (coreGpaMin > 0 && coreGpa !== null && coreGpa < coreGpaMin) return false;
     const sat = parseNum(s['Min SAT (Math+Reading)']);
-    if (satMin && sat !== null && sat < satMin) return false;
-    if (satMax && sat !== null && sat > satMax) return false;
+    if (satMin > 0 && sat !== null && sat < satMin) return false;
     const tuition = s['Tuition (Annual)'];
     if (tuitionMax && tuition && tuition > tuitionMax) return false;
     const enrollment = s['Enrollment'];
     if (enrollmentMax && enrollment && enrollment > enrollmentMax) return false;
     const velo = parseNum(s['Pitcher Velocity (Target)']);
-    if (veloMin && velo !== null && velo < veloMin) return false;
+    if (veloMin > 50 && velo !== null && velo < veloMin) return false;
     const exitVelo = parseNum(s['Position Player Exit Velo (D1)']) || parseNum(s['Position Player Exit Velo (D2)']);
-    if (exitVeloMin && exitVelo !== null && exitVelo < exitVeloMin) return false;
+    if (exitVeloMin > 50 && exitVelo !== null && exitVelo < exitVeloMin) return false;
+    if (dashMax < 8.0) {
+      const dash = parseNum(s['Position Player 60yd Dash']);
+      if (dash !== null && dash > dashMax) return false;
+    }
     if (quality.includes('tourney') && !(s['NCAA Tournament (10yr)'] > 0)) return false;
     if (quality.includes('cws') && !(s['CWS Appearances (10yr)'] > 0)) return false;
     if (quality.includes('draft') && !(s['MLB Draft Picks (10yr)'] > 0)) return false;
@@ -901,9 +972,16 @@ function clearFilters() {
   ['region-filter','state-filter','conference-filter','climate-filter','ranking-filter'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  ['gpa-min','gpa-max','sat-min','sat-max','tuition-max','enrollment-max','velo-min','exit-velo-min'].forEach(id => {
+  ['tuition-max','enrollment-max'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.getElementById('gpa-min').value = 0;
+  document.getElementById('core-gpa-min').value = 0;
+  document.getElementById('sat-min').value = 0;
+  document.getElementById('velo-min').value = 50;
+  document.getElementById('exit-velo-min').value = 50;
+  document.getElementById('dash-max').value = 80;
+  ['gpa-min','core-gpa-min','sat-min','velo-min','exit-velo-min','dash-max'].forEach(id => updateSliderDisplay(id));
   applyFilters();
 }
 
